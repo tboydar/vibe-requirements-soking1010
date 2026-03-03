@@ -1,0 +1,22 @@
+# oh-my-claudecode local state
+.omc/
+
+# Claude Code local state
+.claude/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+.vercel
+
+# Node / Astro
+node_modules/
+dist/
+.astro/
