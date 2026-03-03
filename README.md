@@ -29,10 +29,10 @@ Vibe Coding 的最大瓶頸不是寫程式，而是**不知道要寫什麼**。
 將此資料夾放入你的 Claude Code skills 目錄：
 
 ```bash
-# 複製到 skills 目錄
-cp -r vibe-requirements-soking1010 ~/.claude/skills/vibe-requirements
+# 在此專案根目錄下執行，複製到 skills 目錄
+cp -r . ~/.claude/skills/vibe-requirements
 
-# 或用 git clone
+# 或直接用 git clone 安裝到 skills 目錄
 git clone https://github.com/tboydar/vibe-requirements-soking1010.git ~/.claude/skills/vibe-requirements
 ```
 

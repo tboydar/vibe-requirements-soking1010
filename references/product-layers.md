@@ -80,6 +80,6 @@ Vibe Coder 最容易犯的錯誤是**從下往上想**：
 
 ## 與其他框架的關係
 
-- **戰略層、範圍層**的資訊主要來自 CARNET 訪談（`carnet.md`）
-- **結構層**的設計受複雜度層級影響（`complexity-levels.md`）——Lv1 不需要複雜結構，Lv5 需要多層架構
-- **結構層、框架層**的技術決策可參考架構設計原則（`architecture.md`）
+- **戰略層、範圍層**的資訊主要來自 CARNET 訪談（[carnet.md](./carnet.md)）
+- **結構層**的設計受複雜度層級影響（[complexity-levels.md](./complexity-levels.md)）——Lv1 不需要複雜結構，Lv5 需要多層架構
+- **結構層、框架層**的技術決策可參考架構設計原則（[architecture.md](./architecture.md)）
