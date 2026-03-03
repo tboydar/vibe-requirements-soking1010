@@ -1,0 +1,755 @@
+---
+import Layout from '../layouts/Layout.astro';
+import '../styles/global.css';
+---
+
+<Layout title="Vibe Requirements — 需求探索助手">
+
+  <!-- ==================== NAV ==================== -->
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-brand">Vibe Requirements</a>
+      <button id="hamburger" class="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul id="nav-menu" class="nav-menu">
+        <li><a class="nav-link" data-section="section-hero" href="#section-hero">首頁</a></li>
+        <li><a class="nav-link" data-section="section-workflow" href="#section-workflow">工作流程</a></li>
+        <li><a class="nav-link" data-section="section-carnet" href="#section-carnet">CARNET</a></li>
+        <li><a class="nav-link" data-section="section-complexity" href="#section-complexity">複雜度</a></li>
+        <li><a class="nav-link" data-section="section-layers" href="#section-layers">產品分層</a></li>
+        <li><a class="nav-link" data-section="section-userstory" href="#section-userstory">User Story</a></li>
+        <li><a class="nav-link" data-section="section-ears" href="#section-ears">EARS</a></li>
+        <li><a class="nav-link" data-section="section-architecture" href="#section-architecture">架構</a></li>
+        <li><a class="nav-link" data-section="section-workshop" href="#section-workshop">互動工坊</a></li>
+        <li><a class="nav-link" data-section="section-example" href="#section-example">範例</a></li>
+        <li><a class="nav-link" data-section="section-records" href="#section-records">我的紀錄</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ==================== HERO ==================== -->
+  <section id="section-hero" class="section hero-section">
+    <div class="container">
+      <h1 class="hero-title"><span class="gradient-text">Vibe Requirements</span></h1>
+      <p class="hero-subtitle">需求探索助手</p>
+      <blockquote class="hero-quote">
+        「魔法是想像的世界，無法想像的東西就無法用魔法實現。」
+      </blockquote>
+      <p class="hero-desc">幫助 Vibe Coder 從模糊的產品想法，一步步釐清需求、定義系統複雜度、撰寫 User Story，最終產出可以直接交給 AI 開發的完整需求文件。</p>
+      <div class="hero-actions">
+        <a href="#section-workshop" class="btn btn-primary">開始探索需求</a>
+        <a href="#section-workflow" class="btn btn-secondary">了解框架</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== WORKFLOW ==================== -->
+  <section id="section-workflow" class="section">
+    <div class="container">
+      <h2 class="section-title">五階段工作流程</h2>
+      <p class="section-desc">整個探索分為五個階段，根據你的狀態靈活切換，不必死板按順序走。</p>
+      <div class="workflow-grid">
+        <div class="card workflow-card" data-step="1">
+          <div class="card-step">階段 1</div>
+          <h3>接住想法</h3>
+          <p class="card-subtitle">Catch the Vibe</p>
+          <p>用 CARNET 框架中最關鍵的問題打開對話，快速建立「問題空間」的邊界。一句話複述核心想法，確認方向。</p>
+        </div>
+        <div class="card workflow-card" data-step="2">
+          <div class="card-step">階段 2</div>
+          <h3>判斷複雜度</h3>
+          <p class="card-subtitle">Gauge Complexity</p>
+          <p>幫你定位在五個複雜度層級中的哪一層。不同層級的系統設計截然不同，這個判斷會影響後續所有決策。</p>
+        </div>
+        <div class="card workflow-card" data-step="3">
+          <div class="card-step">階段 3</div>
+          <h3>產品分層思考</h3>
+          <p class="card-subtitle">Think in Layers</p>
+          <p>用「蓋 Shopping Mall」的比喻，引導你從上到下想清楚五個層面：戰略、範圍、結構、框架、表現。</p>
+        </div>
+        <div class="card workflow-card" data-step="4">
+          <div class="card-step">階段 4</div>
+          <h3>寫出 User Story</h3>
+          <p class="card-subtitle">Write User Stories</p>
+          <p>把前面的探索結果轉化為標準的 User Story，用 MoSCoW 排出優先級，確保每條都可被驗證。</p>
+        </div>
+        <div class="card workflow-card" data-step="5">
+          <div class="card-step">階段 5</div>
+          <h3>EARS 品質檢查</h3>
+          <p class="card-subtitle">Verify with EARS</p>
+          <p>用 EARS 語法逐條檢查需求，確保沒有遺漏異常處理、狀態變化、非功能性需求等關鍵面向。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CARNET ==================== -->
+  <section id="section-carnet" class="section">
+    <div class="container">
+      <h2 class="section-title">CARNET 訪談框架</h2>
+      <p class="section-desc">六個面向的訪談工具，幫你從不同角度理解需求的全貌。</p>
+
+      <div class="carnet-grid">
+        <div class="carnet-card">
+          <div class="carnet-letter">C</div>
+          <h3>Constraint <span>限制</span></h3>
+          <p>專案的預算、時間、技術限制是什麼？</p>
+          <div class="carnet-question">「你有多少時間和預算？技術上有什麼限制？」</div>
+        </div>
+        <div class="carnet-card">
+          <div class="carnet-letter">A</div>
+          <h3>Aspiration <span>期待</span></h3>
+          <p>做完之後理想的結果是什麼？</p>
+          <div class="carnet-question">「做完之後，你心目中最理想的結果長什麼樣？」</div>
+        </div>
+        <div class="carnet-card">
+          <div class="carnet-letter">R</div>
+          <h3>Role <span>身份</span></h3>
+          <p>你是為誰做這個？目標用戶是誰？</p>
+          <div class="carnet-question">「誰會來用這個東西？他們有什麼特徵？」</div>
+        </div>
+        <div class="carnet-card">
+          <div class="carnet-letter">N</div>
+          <h3>Need <span>需求來源</span></h3>
+          <p>這個需求是怎麼來的？為什麼現在要做？</p>
+          <div class="carnet-question">「為什麼現在想做這件事？觸發點是什麼？」</div>
+        </div>
+        <div class="carnet-card">
+          <div class="carnet-letter">E</div>
+          <h3>Experience <span>經驗</span></h3>
+          <p>之前有做過類似的嗎？學到什麼教訓？</p>
+          <div class="carnet-question">「之前有試過類似的做法嗎？遇到什麼問題？」</div>
+        </div>
+        <div class="carnet-card">
+          <div class="carnet-letter">T</div>
+          <h3>Trust <span>信念</span></h3>
+          <p>你相信什麼樣的做法是對的？</p>
+          <div class="carnet-question">「你覺得什麼樣的設計原則是最重要的？」</div>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <h4>快速模式 vs 標準模式</h4>
+        <p>如果是自己做給自己用，只需要回答 N（需求）、A（期待）、C（限制）三個問題。做給別人用時，六個面向都要考慮。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== COMPLEXITY ==================== -->
+  <section id="section-complexity" class="section">
+    <div class="container">
+      <h2 class="section-title">五級複雜度模型</h2>
+      <p class="section-desc">用生活化的比喻，幫你快速判斷產品的複雜度層級。</p>
+
+      <div class="complexity-grid">
+        <div class="complexity-card">
+          <span class="level-badge">Lv1</span>
+          <h3>個人工作室</h3>
+          <span class="level-metaphor">像是「自家書桌」</span>
+          <p class="level-detail">只有你自己使用的工具。不需要登入、不需要伺服器，資料存在本機端就好。</p>
+          <div class="level-features">
+            <span class="level-feature">單人使用</span>
+            <span class="level-feature">本機儲存</span>
+            <span class="level-feature">無需後端</span>
+          </div>
+        </div>
+        <div class="complexity-card">
+          <span class="level-badge">Lv2</span>
+          <h3>私人辦公室</h3>
+          <span class="level-metaphor">像是「公司辦公室」</span>
+          <p class="level-detail">同一組織的人共用，需要身分驗證和權限分級。資料存在伺服器端。</p>
+          <div class="level-features">
+            <span class="level-feature">多人共用</span>
+            <span class="level-feature">權限管理</span>
+            <span class="level-feature">需要後端</span>
+          </div>
+        </div>
+        <div class="complexity-card">
+          <span class="level-badge">Lv3</span>
+          <h3>服務門市</h3>
+          <span class="level-metaphor">像是「便利商店」</span>
+          <p class="level-detail">有前台和後台之分，內外角色不同。服務提供方和接受方各有不同的操作介面。</p>
+          <div class="level-features">
+            <span class="level-feature">前台 / 後台</span>
+            <span class="level-feature">角色區分</span>
+            <span class="level-feature">統一 API</span>
+          </div>
+        </div>
+        <div class="complexity-card">
+          <span class="level-badge">Lv4</span>
+          <h3>大眾運動場</h3>
+          <span class="level-metaphor">像是「開放運動中心」</span>
+          <p class="level-detail">大量用戶同時操作、互相互動。需要處理高併發和用戶資產安全。</p>
+          <div class="level-features">
+            <span class="level-feature">用戶互動</span>
+            <span class="level-feature">高併發</span>
+            <span class="level-feature">資產管理</span>
+          </div>
+        </div>
+        <div class="complexity-card">
+          <span class="level-badge">Lv5</span>
+          <h3>數位百貨商場</h3>
+          <span class="level-metaphor">像是「百貨商場」</span>
+          <p class="level-detail">多租戶系統，平台方、入駐商家、終端用戶三層角色。每個租戶的資料完全隔離。</p>
+          <div class="level-features">
+            <span class="level-feature">多租戶</span>
+            <span class="level-feature">三層角色</span>
+            <span class="level-feature">資料隔離</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PRODUCT LAYERS ==================== -->
+  <section id="section-layers" class="section">
+    <div class="container">
+      <h2 class="section-title">產品五層思考</h2>
+      <p class="section-desc">像蓋 Shopping Mall 一樣，從上到下依序想清楚五個層面。</p>
+
+      <div class="layers-stack">
+        <div class="layer-card">
+          <span class="layer-num">第 1 層</span>
+          <h3>戰略層 Strategy</h3>
+          <p class="layer-mall">Shopping Mall：為什麼要蓋？蓋給誰逛？</p>
+          <p class="layer-digital">數位產品：商業目標是什麼？目標用戶是誰？成功指標怎麼衡量？</p>
+        </div>
+        <div class="layer-card">
+          <span class="layer-num">第 2 層</span>
+          <h3>範圍層 Scope</h3>
+          <p class="layer-mall">Shopping Mall：裡面要有什麼？電影院？美食街？溜冰場？</p>
+          <p class="layer-digital">數位產品：核心功能清單是什麼？第一版必做哪些？哪些可以之後再加？</p>
+        </div>
+        <div class="layer-card">
+          <span class="layer-num">第 3 層</span>
+          <h3>結構層 Structure</h3>
+          <p class="layer-mall">Shopping Mall：一樓放什麼？二樓放什麼？動線怎麼走？</p>
+          <p class="layer-digital">數位產品：功能之間怎麼組織？使用者流程怎麼走？資料關係是什麼？</p>
+        </div>
+        <div class="layer-card">
+          <span class="layer-num">第 4 層</span>
+          <h3>框架層 Skeleton</h3>
+          <p class="layer-mall">Shopping Mall：店門口的招牌怎麼設計？走道寬度多少？</p>
+          <p class="layer-digital">數位產品：主要操作方式是什麼？導航怎麼設計？畫面怎麼佈局？</p>
+        </div>
+        <div class="layer-card">
+          <span class="layer-num">第 5 層</span>
+          <h3>表現層 Surface</h3>
+          <p class="layer-mall">Shopping Mall：整體裝潢風格？燈光音樂氛圍？</p>
+          <p class="layer-digital">數位產品：視覺風格、色彩搭配、動畫效果、品牌調性？</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== USER STORY + MOSCOW ==================== -->
+  <section id="section-userstory" class="section">
+    <div class="container">
+      <h2 class="section-title">User Story + MoSCoW</h2>
+      <p class="section-desc">把需求轉化為可執行、可驗證的故事格式，並排出優先級。</p>
+
+      <div class="story-template">
+        作為 <em>[角色]</em>，<br>
+        我想要 <em>[功能]</em>，<br>
+        以便於 <em>[價值]</em>。<br><br>
+        驗收標準：<br>
+        1. [具體可驗證的條件]<br>
+        2. [具體可驗證的條件]<br>
+        3. [具體可驗證的條件]
+      </div>
+
+      <div class="moscow-grid">
+        <div class="moscow-item badge-must">
+          <h4>Must</h4>
+          <p>必須有，沒有就不能上線</p>
+        </div>
+        <div class="moscow-item badge-should">
+          <h4>Should</h4>
+          <p>應該有，能顯著提升價值</p>
+        </div>
+        <div class="moscow-item badge-could">
+          <h4>Could</h4>
+          <p>可以有，有的話更好</p>
+        </div>
+        <div class="moscow-item badge-wont">
+          <h4>Won't</h4>
+          <p>這次先不做，留給未來</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== EARS ==================== -->
+  <section id="section-ears" class="section">
+    <div class="container">
+      <h2 class="section-title">EARS 需求語法</h2>
+      <p class="section-desc">五種標準句型，確保每條需求都清楚、可驗證、不遺漏。</p>
+
+      <div class="ears-grid">
+        <div class="ears-card">
+          <span class="ears-type">隨時作用型</span>
+          <div class="ears-pattern">系統<em>應該要</em> ___</div>
+          <p class="ears-desc">不需要觸發條件，系統隨時都該滿足的需求</p>
+          <div class="ears-example">例：系統應該要以 HTTPS 加密所有傳輸資料</div>
+        </div>
+        <div class="ears-card">
+          <span class="ears-type">事件驅動型</span>
+          <div class="ears-pattern"><em>當</em> ___ 時，系統<em>應該要</em> ___</div>
+          <p class="ears-desc">特定事件發生時才觸發的需求</p>
+          <div class="ears-example">例：當飼主送出預約請求時，系統應該要推送通知給散步員</div>
+        </div>
+        <div class="ears-card">
+          <span class="ears-type">異常處理型</span>
+          <div class="ears-pattern"><em>如果</em> ___，<em>那麼</em>系統<em>應該要</em> ___</div>
+          <p class="ears-desc">非預期情況發生時的處理方式</p>
+          <div class="ears-example">例：如果 GPS 訊號中斷超過 5 分鐘，那麼系統應該要通知飼主</div>
+        </div>
+        <div class="ears-card">
+          <span class="ears-type">狀態驅動型</span>
+          <div class="ears-pattern"><em>當處於</em> ___ 時，系統<em>應該要</em> ___</div>
+          <p class="ears-desc">系統在特定狀態下持續滿足的需求</p>
+          <div class="ears-example">例：當散步處於進行中狀態時，系統應該要每 30 秒更新位置</div>
+        </div>
+        <div class="ears-card">
+          <span class="ears-type">選配功能型</span>
+          <div class="ears-pattern"><em>如果系統包含</em> ___，系統<em>應該要</em> ___</div>
+          <p class="ears-desc">只在特定功能存在時才適用的需求</p>
+          <div class="ears-example">例：如果系統包含即時聊天功能，系統應該要支援圖片傳送</div>
+        </div>
+      </div>
+
+      <div class="ears-checklist">
+        <h4>完成標準</h4>
+        <ul>
+          <li>每個 Must 等級的 User Story 至少有 1 條對應的 EARS 需求</li>
+          <li>至少有 2 條「異常處理型」需求（系統不會只有 happy path）</li>
+          <li>如果有涉及金錢或個資的功能，至少有 1 條安全性相關的「隨時作用型」需求</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== ARCHITECTURE ==================== -->
+  <section id="section-architecture" class="section">
+    <div class="container">
+      <h2 class="section-title">架構與技術建議</h2>
+      <p class="section-desc">根據複雜度層級，提供對應的架構思考方向和技術選型建議。</p>
+
+      <div class="arch-principles">
+        <div class="arch-card">
+          <h4>關注點分離</h4>
+          <p>不同角色看到不同的介面，但共用同一組資料和 API。前台重體驗，後台重效率。</p>
+        </div>
+        <div class="arch-card">
+          <h4>統一介面</h4>
+          <p>所有端共用同一組 API，依角色和權限回傳不同的資料範圍。避免重複開發。</p>
+        </div>
+        <div class="arch-card">
+          <h4>模組封裝</h4>
+          <p>地圖追蹤、通知推播、付款等功能各自獨立模組，互不影響，方便替換和維護。</p>
+        </div>
+        <div class="arch-card">
+          <h4>漸進式複雜度</h4>
+          <p>不要一開始就設計 Lv5 架構。先做能跑的 MVP，再根據實際需求逐步加強。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== INTERACTIVE WORKSHOP ==================== -->
+  <section id="section-workshop" class="section">
+    <div class="container">
+      <h2 class="section-title">互動工坊</h2>
+      <p class="section-desc">一步步完成你的需求探索，從模糊想法到完整需求文件。</p>
+
+      <div class="workshop-container">
+        <div class="stage-tabs">
+          <button class="stage-tab active" data-stage="1">
+            <span class="stage-tab-num">1</span>
+            <span class="stage-tab-label">接住想法</span>
+          </button>
+          <button class="stage-tab" data-stage="2">
+            <span class="stage-tab-num">2</span>
+            <span class="stage-tab-label">判斷複雜度</span>
+          </button>
+          <button class="stage-tab" data-stage="3">
+            <span class="stage-tab-num">3</span>
+            <span class="stage-tab-label">產品分層</span>
+          </button>
+          <button class="stage-tab" data-stage="4">
+            <span class="stage-tab-num">4</span>
+            <span class="stage-tab-label">User Story</span>
+          </button>
+          <button class="stage-tab" data-stage="5">
+            <span class="stage-tab-num">5</span>
+            <span class="stage-tab-label">EARS 檢查</span>
+          </button>
+        </div>
+
+        <!-- Stage 1: CARNET -->
+        <div id="workshop-stage-1" class="stage-panel active" data-stage="1">
+          <h3>階段一：接住想法（CARNET）</h3>
+          <div class="mode-toggle">
+            <label class="toggle-label">
+              <input type="radio" name="carnet-mode" value="quick" data-stage="1" data-field="carnet-mode" checked>
+              <span>快速模式（自己做給自己用）</span>
+            </label>
+            <label class="toggle-label">
+              <input type="radio" name="carnet-mode" value="standard" data-stage="1" data-field="carnet-mode">
+              <span>標準模式（做給別人用）</span>
+            </label>
+          </div>
+
+          <div id="carnet-quick-fields" class="carnet-fields">
+            <div class="form-group">
+              <label for="field-need">我想解決什麼問題？（N - Need）</label>
+              <textarea id="field-need" data-stage="1" data-field="need" rows="3" placeholder="描述你想解決的問題..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="field-aspiration">做完之後理想的樣子是什麼？（A - Aspiration）</label>
+              <textarea id="field-aspiration" data-stage="1" data-field="aspiration" rows="3" placeholder="描述你心中的理想成果..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="field-constraint">我有多少時間和能力？（C - Constraint）</label>
+              <textarea id="field-constraint" data-stage="1" data-field="constraint" rows="3" placeholder="描述你的限制條件..."></textarea>
+            </div>
+          </div>
+
+          <div id="carnet-standard-fields" class="carnet-fields" style="display:none;">
+            <div class="form-group">
+              <label for="field-role">我是為誰做這個？（R - Role）</label>
+              <textarea id="field-role" data-stage="1" data-field="role" rows="3" placeholder="描述目標使用者和利害關係人..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="field-need-std">為什麼現在要做？（N - Need）</label>
+              <textarea id="field-need-std" data-stage="1" data-field="need" rows="3" placeholder="描述專案的觸發原因..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="field-aspiration-std">做完之後最理想的結果是什麼？（A - Aspiration）</label>
+              <textarea id="field-aspiration-std" data-stage="1" data-field="aspiration" rows="3" placeholder="描述成功的樣貌..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="field-experience">我之前試過什麼？學到什麼？（E - Experience）</label>
+              <textarea id="field-experience" data-stage="1" data-field="experience" rows="3" placeholder="描述過去的經驗和教訓..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="field-constraint-std">時間、預算、技術能力有什麼限制？（C - Constraint）</label>
+              <textarea id="field-constraint-std" data-stage="1" data-field="constraint" rows="3" placeholder="描述限制條件..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="field-trust">我相信什麼樣的做法是對的？（T - Trust）</label>
+              <textarea id="field-trust" data-stage="1" data-field="trust" rows="3" placeholder="描述你的信念和偏好..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="field-summary">一句話摘要：用一句話描述你的核心想法</label>
+            <textarea id="field-summary" data-stage="1" data-field="summary" rows="2" placeholder="例：我想做一個幫上班族預約遛狗服務的平台"></textarea>
+          </div>
+        </div>
+
+        <!-- Stage 2: Complexity -->
+        <div id="workshop-stage-2" class="stage-panel" data-stage="2">
+          <h3>階段二：判斷複雜度</h3>
+          <p>回答以下問題，系統會幫你判斷產品的複雜度層級。</p>
+
+          <div class="quiz-group">
+            <div class="quiz-question">
+              <p><strong>Q1：只有你自己用嗎？</strong></p>
+              <label class="radio-label">
+                <input type="radio" name="complexity-q1" data-stage="2" data-field="q1" value="yes">
+                <span>是，只有我自己用</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="complexity-q1" data-stage="2" data-field="q1" value="no">
+                <span>不是，其他人也會用</span>
+              </label>
+            </div>
+            <div class="quiz-question">
+              <p><strong>Q2：使用者都是同一個組織內部的人嗎？</strong></p>
+              <label class="radio-label">
+                <input type="radio" name="complexity-q2" data-stage="2" data-field="q2" value="yes">
+                <span>是，都是內部人員</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="complexity-q2" data-stage="2" data-field="q2" value="no">
+                <span>不是，有外部使用者</span>
+              </label>
+            </div>
+            <div class="quiz-question">
+              <p><strong>Q3：有「服務提供方」和「服務接受方」的區別嗎？</strong></p>
+              <label class="radio-label">
+                <input type="radio" name="complexity-q3" data-stage="2" data-field="q3" value="yes">
+                <span>是，有前台和後台的概念</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="complexity-q3" data-stage="2" data-field="q3" value="no">
+                <span>不是，所有人角色平等</span>
+              </label>
+            </div>
+            <div class="quiz-question">
+              <p><strong>Q4：用戶之間會互相看到彼此、互動嗎？</strong></p>
+              <label class="radio-label">
+                <input type="radio" name="complexity-q4" data-stage="2" data-field="q4" value="yes">
+                <span>是，用戶之間有互動</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="complexity-q4" data-stage="2" data-field="q4" value="no">
+                <span>不是，用戶彼此獨立</span>
+              </label>
+            </div>
+            <div class="quiz-question">
+              <p><strong>Q5：會有「第三方入駐」的概念嗎？</strong></p>
+              <label class="radio-label">
+                <input type="radio" name="complexity-q5" data-stage="2" data-field="q5" value="yes">
+                <span>是，有多租戶的概念</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="complexity-q5" data-stage="2" data-field="q5" value="no">
+                <span>不是，單一營運方</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="complexity-result" class="complexity-result" style="display:none;">
+            <h4>判定結果</h4>
+            <p id="complexity-result-text"></p>
+          </div>
+
+          <div class="form-group">
+            <label for="field-complexity-notes">備註（可選）</label>
+            <textarea id="field-complexity-notes" data-stage="2" data-field="notes" rows="3" placeholder="對複雜度判定的補充說明..."></textarea>
+          </div>
+        </div>
+
+        <!-- Stage 3: Product Layers -->
+        <div id="workshop-stage-3" class="stage-panel" data-stage="3">
+          <h3>階段三：產品分層思考</h3>
+          <p>從上到下想清楚五個層面，不要直接跳到表現層。</p>
+
+          <div class="form-group">
+            <label for="field-strategy">戰略層：為什麼要做？給誰用？</label>
+            <textarea id="field-strategy" data-stage="3" data-field="strategy" rows="4" placeholder="描述商業目標、目標用戶、成功衡量標準..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="field-scope">範圍層：裡面該有什麼功能？</label>
+            <textarea id="field-scope" data-stage="3" data-field="scope" rows="4" placeholder="列出核心功能清單、區分第一版必做和可以之後再加的..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="field-structure">結構層：功能之間怎麼組織？流程怎麼走？</label>
+            <textarea id="field-structure" data-stage="3" data-field="structure" rows="4" placeholder="描述功能關係、使用者流程、資料關係..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="field-skeleton">框架層：使用者怎麼操作？畫面怎麼安排？</label>
+            <textarea id="field-skeleton" data-stage="3" data-field="skeleton" rows="4" placeholder="描述主要操作方式、導航設計、畫面佈局..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="field-surface">表現層：看起來、感覺起來如何？</label>
+            <textarea id="field-surface" data-stage="3" data-field="surface" rows="4" placeholder="描述視覺風格、色彩、動畫等..."></textarea>
+          </div>
+        </div>
+
+        <!-- Stage 4: User Stories -->
+        <div id="workshop-stage-4" class="stage-panel" data-stage="4">
+          <h3>階段四：寫出 User Story</h3>
+          <p>把前面的探索結果轉化為標準的 User Story，並標上 MoSCoW 優先級。</p>
+
+          <div id="userstory-list" class="userstory-list"></div>
+          <button id="btn-add-story" class="btn btn-secondary" data-stage="4">+ 新增 User Story</button>
+
+          <template id="userstory-template">
+            <div class="card userstory-item" data-stage="4" data-field="story">
+              <div class="userstory-header">
+                <span class="userstory-number"></span>
+                <select class="moscow-select" data-stage="4" data-field="moscow">
+                  <option value="">優先級</option>
+                  <option value="must">Must</option>
+                  <option value="should">Should</option>
+                  <option value="could">Could</option>
+                  <option value="wont">Won't</option>
+                </select>
+                <button class="btn-remove-story" title="刪除此 Story">&times;</button>
+              </div>
+              <div class="form-group">
+                <label>角色</label>
+                <input type="text" class="story-role" data-stage="4" data-field="story-role" placeholder="作為一名...">
+              </div>
+              <div class="form-group">
+                <label>功能</label>
+                <input type="text" class="story-feature" data-stage="4" data-field="story-feature" placeholder="我想要...">
+              </div>
+              <div class="form-group">
+                <label>價值</label>
+                <input type="text" class="story-value" data-stage="4" data-field="story-value" placeholder="以便於...">
+              </div>
+              <div class="form-group">
+                <label>驗收標準</label>
+                <textarea class="story-criteria" data-stage="4" data-field="story-criteria" rows="3" placeholder="1. 具體可驗證的條件&#10;2. 具體可驗證的條件&#10;3. 具體可驗證的條件"></textarea>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- Stage 5: EARS -->
+        <div id="workshop-stage-5" class="stage-panel" data-stage="5">
+          <h3>階段五：EARS 需求品質檢查</h3>
+          <p>用 EARS 語法檢查每條需求是否夠清楚。</p>
+
+          <div id="ears-list" class="ears-list"></div>
+          <button id="btn-add-ears" class="btn btn-secondary" data-stage="5">+ 新增 EARS 需求</button>
+
+          <template id="ears-template">
+            <div class="card ears-item" data-stage="5" data-field="ears">
+              <div class="ears-item-header">
+                <select class="ears-type-select" data-stage="5" data-field="ears-type">
+                  <option value="">選擇類型</option>
+                  <option value="ubiquitous">隨時作用型</option>
+                  <option value="event">事件驅動型</option>
+                  <option value="unwanted">異常處理型</option>
+                  <option value="state">狀態驅動型</option>
+                  <option value="optional">選配功能型</option>
+                </select>
+                <button class="btn-remove-ears" title="刪除此需求">&times;</button>
+              </div>
+              <div class="ears-hint"></div>
+              <div class="form-group">
+                <label>需求描述</label>
+                <textarea class="ears-content" data-stage="5" data-field="ears-content" rows="2" placeholder="按照所選句型撰寫需求..."></textarea>
+              </div>
+            </div>
+          </template>
+
+          <div class="ears-completion">
+            <h4>完成標準檢查</h4>
+            <ul class="ears-checklist-workshop">
+              <li>每個 Must 等級的 User Story 至少有 1 條對應的 EARS 需求</li>
+              <li>至少有 2 條「異常處理型」需求</li>
+              <li>如果有涉及金錢或個資的功能，至少有 1 條安全性相關的「隨時作用型」需求</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== EXAMPLE OUTPUT ==================== -->
+  <section id="section-example" class="section">
+    <div class="container">
+      <h2 class="section-title">範例：寵物散步媒合平台</h2>
+      <p class="section-desc">以下是 Vibe Requirements 探索完成後的產出範例。</p>
+
+      <div class="example-content">
+        <div class="card example-block">
+          <h3>1. 產品概述</h3>
+          <p>許多上班族養了寵物卻經常加班，沒時間帶毛孩出門散步。這個平台媒合「需要遛狗服務的飼主」和「願意幫忙遛狗的散步員」，讓飼主透過 App 預約附近的散步員，並在散步過程中即時追蹤寵物狀況。</p>
+        </div>
+
+        <div class="card example-block">
+          <h3>2. 複雜度評估</h3>
+          <p><strong>Lv3：服務門市（前台與後台）</strong></p>
+          <p>這是一個典型的「內外有別」系統——就像一間便利商店：</p>
+          <ul>
+            <li><strong>前台（飼主端）</strong>：搜尋散步員、預約服務、追蹤散步進度、評價</li>
+            <li><strong>後台（散步員端）</strong>：管理時段、接受/拒絕預約、回報散步狀態</li>
+            <li><strong>管理後台</strong>：審核散步員資格、處理糾紛、查看營運數據</li>
+          </ul>
+        </div>
+
+        <div class="card example-block">
+          <h3>3. 核心 User Stories</h3>
+          <div class="example-story">
+            <h4><span class="badge-must">Must</span> Story 1：飼主預約散步服務</h4>
+            <pre class="code-block">作為一名飼主，
+我想要搜尋並預約附近的散步員，
+以便於在我無法出門時，毛孩也能得到充足的運動。
+
+驗收標準：
+1. 飼主可依地區、時段、評價篩選可用的散步員
+2. 預約需填寫：日期、時段（30分鐘/60分鐘）、寵物、特殊注意事項
+3. 送出預約後，散步員需在 30 分鐘內回覆接受或拒絕
+4. 若超時未回覆，系統自動取消並建議其他散步員</pre>
+          </div>
+          <div class="example-story">
+            <h4><span class="badge-should">Should</span> Story 2：飼主即時追蹤散步進度</h4>
+            <pre class="code-block">作為一名飼主，
+我想要在散步進行中看到即時的路線與照片，
+以便於安心知道毛孩的狀態。
+
+驗收標準：
+1. 散步開始後，飼主可在地圖上看到即時路線
+2. 散步員可拍照上傳，飼主即時收到通知
+3. 散步結束後，系統自動產生散步報告
+4. 飼主可對本次服務評分（1-5 星）並留言</pre>
+          </div>
+        </div>
+
+        <div class="card example-block">
+          <h3>4. EARS 格式需求（部分）</h3>
+          <div class="ears-examples-list">
+            <p><strong>隨時作用型：</strong></p>
+            <ul>
+              <li>系統應該要以 HTTPS 加密所有傳輸資料</li>
+              <li>系統應該要在 3 秒內回應使用者的操作</li>
+            </ul>
+            <p><strong>事件驅動型：</strong></p>
+            <ul>
+              <li>當散步員點擊「開始散步」時，系統應該要啟動 GPS 追蹤並通知飼主</li>
+            </ul>
+            <p><strong>異常處理型：</strong></p>
+            <ul>
+              <li>如果 GPS 訊號中斷超過 5 分鐘，那麼系統應該要通知飼主並顯示最後已知位置</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== MY RECORDS ==================== -->
+  <section id="section-records" class="section">
+    <div class="container">
+      <h2 class="section-title">我的紀錄</h2>
+      <p class="section-desc">你的需求探索紀錄儲存在瀏覽器中，可以隨時回來繼續。</p>
+
+      <div class="records-actions">
+        <div class="form-group records-name-group">
+          <label for="session-name">紀錄名稱</label>
+          <input type="text" id="session-name" placeholder="為這次探索取個名字...">
+        </div>
+        <div class="records-buttons">
+          <button id="btn-new-session" class="btn btn-secondary">新建紀錄</button>
+          <button id="btn-save-session" class="btn btn-primary">儲存紀錄</button>
+          <button id="btn-export-md" class="btn btn-secondary">匯出 Markdown</button>
+        </div>
+      </div>
+
+      <div id="records-list" class="records-list">
+        <p class="records-empty">目前沒有儲存的紀錄。開始你的第一次需求探索吧！</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer id="section-footer" class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <strong>Vibe Requirements</strong>
+          <p>需求探索助手 — 幫助 Vibe Coder 從模糊想法到完整需求文件</p>
+        </div>
+        <div class="footer-links">
+          <a href="https://github.com/soking1010/vibe-requirements" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="#section-hero">回到頂部</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>Built with Astro + Claude Code. Powered by Vibe Coding.</p>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast-container"></div>
+
+  <script src="../scripts/workshop.js"></script>
+</Layout>

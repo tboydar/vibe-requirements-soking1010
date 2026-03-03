@@ -1,6 +1,6 @@
 // ============================================
 // Vibe Requirements - Interactive Workshop App
-// Vanilla JS, no external dependencies
+// Rewritten to align with HTML structure
 // ============================================
 
 (() => {
@@ -18,16 +18,6 @@
     };
   }
 
-  function escapeAttr(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-  }
-
-  /** Create an element with attributes and children using safe DOM APIs */
   function el(tag, attrs = {}, children = []) {
     const node = document.createElement(tag);
     for (const [key, val] of Object.entries(attrs)) {
@@ -57,7 +47,9 @@
         const target = document.getElementById(targetId);
         if (target) {
           target.scrollIntoView({ behavior: 'smooth' });
-          document.querySelector('.nav-mobile')?.classList.remove('active');
+          // Close mobile menu
+          const navMenu = document.getElementById('nav-menu');
+          if (navMenu) navMenu.classList.remove('open');
         }
       });
     });
@@ -79,20 +71,20 @@
     }
 
     // Mobile hamburger toggle
-    const hamburger = document.querySelector('.hamburger');
+    const hamburger = document.getElementById('hamburger');
     if (hamburger) {
       hamburger.addEventListener('click', () => {
-        const nav = document.querySelector('.nav-mobile');
-        if (nav) nav.classList.toggle('active');
+        const navMenu = document.getElementById('nav-menu');
+        if (navMenu) navMenu.classList.toggle('open');
         hamburger.classList.toggle('active');
       });
     }
 
     // Sticky header shadow on scroll
-    const header = document.querySelector('.site-header');
-    if (header) {
+    const nav = document.getElementById('main-nav');
+    if (nav) {
       window.addEventListener('scroll', () => {
-        header.classList.toggle('scrolled', window.scrollY > 10);
+        nav.classList.toggle('scrolled', window.scrollY > 10);
       }, { passive: true });
     }
   }
@@ -111,238 +103,149 @@
         if (!stage) return;
         tabs.forEach(t => t.classList.toggle('active', t.dataset.stage === stage));
         panels.forEach(p => {
-          p.classList.toggle('active', p.dataset.stage === stage);
-          p.hidden = p.dataset.stage !== stage;
+          const isActive = p.dataset.stage === stage;
+          p.classList.toggle('active', isActive);
+          p.hidden = !isActive;
         });
       });
+    });
+
+    // Initially hide non-active panels
+    panels.forEach(p => {
+      if (!p.classList.contains('active')) p.hidden = true;
     });
   }
 
   // ============================================
   // 3. STAGE 1 - CARNET MODULE
   // ============================================
-
-  const CARNET_FIELDS = {
-    quick: ['need', 'aspiration', 'constraint'],
-    standard: ['constraint', 'aspiration', 'role', 'need', 'experience', 'trust']
-  };
-
-  const CARNET_LABELS = {
-    constraint:  { letter: 'C', label: 'Constraint（限制）',  placeholder: '專案的預算、時間、技術限制是什麼？' },
-    aspiration:  { letter: 'A', label: 'Aspiration（期待）',  placeholder: '做完之後理想的結果是什麼？' },
-    role:        { letter: 'R', label: 'Role（身份）',        placeholder: '你是為誰做這個？目標用戶是誰？' },
-    need:        { letter: 'N', label: 'Need（需求來源）',    placeholder: '這個需求是怎麼來的？為什麼現在要做？' },
-    experience:  { letter: 'E', label: 'Experience（經驗）',  placeholder: '之前有做過類似的嗎？學到什麼教訓？' },
-    trust:       { letter: 'T', label: 'Trust（信念）',       placeholder: '你相信什麼樣的做法是對的？' }
-  };
+  // HTML has pre-built fields in #carnet-quick-fields and #carnet-standard-fields
+  // Toggle visibility based on radio selection
 
   function initStage1() {
-    const container = document.querySelector('.stage-panel[data-stage="1"]');
-    if (!container) return;
+    const quickFields = document.getElementById('carnet-quick-fields');
+    const standardFields = document.getElementById('carnet-standard-fields');
+    const modeRadios = document.querySelectorAll('input[name="carnet-mode"]');
 
-    const modeContainer = container.querySelector('.carnet-mode-toggle');
-    const fieldsContainer = container.querySelector('.carnet-fields');
-    if (!modeContainer || !fieldsContainer) return;
+    if (!quickFields || !standardFields || modeRadios.length === 0) return;
 
-    modeContainer.querySelectorAll('[data-mode]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const mode = btn.dataset.mode;
-        modeContainer.querySelectorAll('[data-mode]').forEach(b =>
-          b.classList.toggle('active', b.dataset.mode === mode)
-        );
-        renderCarnetFields(fieldsContainer, mode);
-        restoreStage1Fields();
+    function switchMode(mode) {
+      quickFields.style.display = mode === 'quick' ? '' : 'none';
+      standardFields.style.display = mode === 'standard' ? '' : 'none';
+    }
+
+    modeRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        switchMode(radio.value);
+        debouncedSave();
       });
     });
 
-    const initialMode = modeContainer.querySelector('[data-mode].active')?.dataset.mode || 'quick';
-    renderCarnetFields(fieldsContainer, initialMode);
-  }
-
-  function renderCarnetFields(container, mode) {
-    const fields = CARNET_FIELDS[mode] || CARNET_FIELDS.quick;
-    // Clear and rebuild using safe DOM methods
-    container.textContent = '';
-    container.dataset.currentMode = mode;
-
-    fields.forEach(field => {
-      const info = CARNET_LABELS[field];
-      const wrapper = el('div', { className: 'carnet-field' });
-
-      const label = el('label', { className: 'carnet-label' }, [
-        el('span', { className: 'carnet-letter', textContent: info.letter }),
-        ` ${info.label}`
-      ]);
-
-      const textarea = el('textarea', {
-        className: 'form-textarea',
-        'data-stage': '1',
-        'data-field': field,
-        placeholder: info.placeholder,
-        rows: '3'
-      });
-
-      wrapper.appendChild(label);
-      wrapper.appendChild(textarea);
-      container.appendChild(wrapper);
-    });
-  }
-
-  function restoreStage1Fields() {
-    const session = getCurrentSession();
-    if (!session) return;
-    const stageData = session.stages[1] || {};
-    document.querySelectorAll('[data-stage="1"][data-field]').forEach(input => {
-      const val = stageData[input.dataset.field];
-      if (val !== undefined) input.value = val;
-    });
+    // Set initial state
+    const checkedRadio = document.querySelector('input[name="carnet-mode"]:checked');
+    if (checkedRadio) switchMode(checkedRadio.value);
   }
 
   // ============================================
   // 4. STAGE 2 - COMPLEXITY CALCULATOR
   // ============================================
+  // HTML has pre-built quiz questions with names complexity-q1 through complexity-q5
 
   const COMPLEXITY_QUESTIONS = [
-    { id: 'q1', text: '只有你自己用嗎？',                                     yesLevel: 1 },
-    { id: 'q2', text: '使用者都是同一個組織內部的人嗎？',                       yesLevel: 2 },
-    { id: 'q3', text: '有「服務提供方」和「服務接受方」的區別嗎？',             yesLevel: 3 },
-    { id: 'q4', text: '所有用戶都是平等的，可以互相互動嗎？',                   yesLevel: 4 },
-    { id: 'q5', text: '會有「第三方入駐」，每個入駐方有自己的客戶嗎？',         yesLevel: 5 }
+    { name: 'complexity-q1', yesLevel: 1 },
+    { name: 'complexity-q2', yesLevel: 2 },
+    { name: 'complexity-q3', yesLevel: 3 },
+    { name: 'complexity-q4', yesLevel: 4 },
+    { name: 'complexity-q5', yesLevel: 5 }
   ];
 
   const COMPLEXITY_LEVELS = {
-    0: { name: '尚未評估',         metaphor: '',           description: '' },
-    1: { name: 'Lv1：個人工作室',  metaphor: '自家書桌',   description: '只有你自己使用的工具，資料存在本機端。' },
-    2: { name: 'Lv2：私人辦公室',  metaphor: '公司辦公室', description: '同一組織的人使用，需要登入和權限分級。' },
-    3: { name: 'Lv3：服務門市',    metaphor: '便利商店',   description: '有前台和後台之分，內外角色不同。' },
+    0: { name: '尚未評估',         metaphor: '',             description: '' },
+    1: { name: 'Lv1：個人工作室',  metaphor: '自家書桌',     description: '只有你自己使用的工具，資料存在本機端。' },
+    2: { name: 'Lv2：私人辦公室',  metaphor: '公司辦公室',   description: '同一組織的人使用，需要登入和權限分級。' },
+    3: { name: 'Lv3：服務門市',    metaphor: '便利商店',     description: '有前台和後台之分，內外角色不同。' },
     4: { name: 'Lv4：大眾運動場',  metaphor: '開放運動中心', description: '大量用戶互動，需處理併發和用戶資產。' },
-    5: { name: 'Lv5：數位百貨商場', metaphor: '百貨商場',   description: '多租戶系統，三層角色，資料完全隔離。' }
+    5: { name: 'Lv5：數位百貨商場', metaphor: '百貨商場',     description: '多租戶系統，三層角色，資料完全隔離。' }
   };
 
   function initStage2() {
-    const container = document.querySelector('.stage-panel[data-stage="2"]');
-    if (!container) return;
+    const quizGroup = document.querySelector('.quiz-group');
+    if (!quizGroup) return;
 
-    const questionsContainer = container.querySelector('.complexity-questions');
-    if (!questionsContainer) return;
-
-    // Build questions using safe DOM methods
-    questionsContainer.textContent = '';
-    COMPLEXITY_QUESTIONS.forEach((q, i) => {
-      const qDiv = el('div', { className: 'complexity-question', 'data-question': String(i) });
-      qDiv.appendChild(el('p', { className: 'question-text', textContent: `${i + 1}. ${q.text}` }));
-
-      const options = el('div', { className: 'question-options' });
-      ['yes', 'no'].forEach(val => {
-        const lbl = el('label', { className: 'radio-label' });
-        const radio = el('input', { type: 'radio', name: `complexity-q${i}`, value: val, 'data-stage': '2', 'data-question': String(i) });
-        lbl.appendChild(radio);
-        lbl.appendChild(el('span', { className: 'radio-mark' }));
-        lbl.appendChild(document.createTextNode(val === 'yes' ? ' 是' : ' 否'));
-        options.appendChild(lbl);
-      });
-      qDiv.appendChild(options);
-      questionsContainer.appendChild(qDiv);
+    quizGroup.addEventListener('change', () => {
+      calculateComplexity();
+      debouncedSave();
     });
-
-    questionsContainer.addEventListener('change', () => calculateComplexity(container));
   }
 
-  function calculateComplexity(container) {
-    const answers = [];
+  function calculateComplexity() {
     let resultLevel = 0;
+    const answers = [];
 
     for (let i = 0; i < COMPLEXITY_QUESTIONS.length; i++) {
-      const checked = container.querySelector(`input[name="complexity-q${i}"]:checked`);
+      const q = COMPLEXITY_QUESTIONS[i];
+      const checked = document.querySelector(`input[name="${q.name}"]:checked`);
       if (!checked) { answers.push(null); break; }
 
       const val = checked.value === 'yes';
       answers.push(val);
 
       if (val) {
-        resultLevel = COMPLEXITY_QUESTIONS[i].yesLevel;
-        disableQuestionsAfter(container, i);
+        resultLevel = q.yesLevel;
+        // Disable subsequent questions
+        for (let j = i + 1; j < COMPLEXITY_QUESTIONS.length; j++) {
+          document.querySelectorAll(`input[name="${COMPLEXITY_QUESTIONS[j].name}"]`).forEach(r => {
+            r.checked = false;
+            r.disabled = true;
+            r.closest('.quiz-question')?.classList.add('disabled');
+          });
+        }
         break;
+      } else {
+        // Enable next question
+        if (i + 1 < COMPLEXITY_QUESTIONS.length) {
+          document.querySelectorAll(`input[name="${COMPLEXITY_QUESTIONS[i + 1].name}"]`).forEach(r => {
+            r.disabled = false;
+            r.closest('.quiz-question')?.classList.remove('disabled');
+          });
+        }
+        // If all answered "no", level is 5
+        if (i === COMPLEXITY_QUESTIONS.length - 1) resultLevel = 5;
       }
-      enableQuestion(container, i + 1);
-
-      if (i === COMPLEXITY_QUESTIONS.length - 1 && !val) resultLevel = 5;
     }
 
     // Update result display
-    const resultContainer = container.querySelector('.complexity-result');
-    if (resultContainer) {
-      resultContainer.textContent = '';
+    const resultDiv = document.getElementById('complexity-result');
+    const resultText = document.getElementById('complexity-result-text');
+    if (resultDiv && resultText) {
       if (resultLevel > 0) {
         const level = COMPLEXITY_LEVELS[resultLevel];
-        const badge = el('div', { className: `result-badge level-${resultLevel}` }, [
-          el('span', { className: 'result-level', textContent: level.name }),
-          el('span', { className: 'result-metaphor', textContent: `像是「${level.metaphor}」` })
-        ]);
-        resultContainer.appendChild(badge);
-        resultContainer.appendChild(el('p', { className: 'result-description', textContent: level.description }));
-        resultContainer.hidden = false;
+        resultText.textContent = `${level.name}（${level.metaphor}）— ${level.description}`;
+        resultDiv.style.display = '';
       } else {
-        resultContainer.hidden = true;
+        resultDiv.style.display = 'none';
       }
     }
 
-    // Store result
-    const hiddenField = container.querySelector('[data-stage="2"][data-field="level"]');
-    if (hiddenField) hiddenField.value = resultLevel;
-
-    const session = getCurrentSession();
-    if (session) {
-      session.stages[2] = { level: resultLevel, answers };
-      saveSession(session);
-    }
-  }
-
-  function disableQuestionsAfter(container, index) {
-    for (let i = index + 1; i < COMPLEXITY_QUESTIONS.length; i++) {
-      const q = container.querySelector(`.complexity-question[data-question="${i}"]`);
-      if (q) {
-        q.classList.add('disabled');
-        q.querySelectorAll('input[type="radio"]').forEach(r => { r.checked = false; r.disabled = true; });
-      }
-    }
-  }
-
-  function enableQuestion(container, index) {
-    const q = container.querySelector(`.complexity-question[data-question="${index}"]`);
-    if (q) {
-      q.classList.remove('disabled');
-      q.querySelectorAll('input[type="radio"]').forEach(r => { r.disabled = false; });
-    }
+    return { level: resultLevel, answers };
   }
 
   // ============================================
-  // 5. STAGE 3 - PRODUCT LAYERS
+  // 5. STAGE 4 - USER STORIES + MOSCOW
   // ============================================
-  // Plain textareas with data-stage="3" data-field="strategy|scope|structure|skeleton|surface"
-  // No special init needed; auto-save is handled by localStorage module.
-
-  // ============================================
-  // 6. STAGE 4 - USER STORIES + MOSCOW
-  // ============================================
-
-  let storyCounter = 0;
 
   function initStage4() {
-    const container = document.querySelector('.stage-panel[data-stage="4"]');
-    if (!container) return;
-
-    const addBtn = container.querySelector('.btn-add-story');
-    const listContainer = container.querySelector('.stories-list');
+    const addBtn = document.getElementById('btn-add-story');
+    const listContainer = document.getElementById('userstory-list');
     if (!addBtn || !listContainer) return;
 
-    addBtn.addEventListener('click', () => addStoryCard(listContainer));
+    addBtn.addEventListener('click', () => addStoryFromTemplate(listContainer));
 
     listContainer.addEventListener('click', e => {
       const removeBtn = e.target.closest('.btn-remove-story');
       if (removeBtn) {
-        removeBtn.closest('.story-card')?.remove();
-        saveFromForm();
+        removeBtn.closest('.userstory-item')?.remove();
+        debouncedSave();
       }
     });
 
@@ -350,79 +253,59 @@
     listContainer.addEventListener('change', debounce(() => saveFromForm(), 500));
   }
 
-  function addStoryCard(container, data = {}) {
-    storyCounter++;
-    const card = el('div', { className: 'story-card', 'data-story-id': String(data.id || storyCounter) });
+  function addStoryFromTemplate(container, data = {}) {
+    const template = document.getElementById('userstory-template');
+    if (!template) return;
 
-    // Header
-    const header = el('div', { className: 'story-header' });
-    header.appendChild(el('span', { className: 'story-number', textContent: `Story #${container.children.length + 1}` }));
-    const removeBtn = el('button', { type: 'button', className: 'btn-remove-story', 'aria-label': '移除此 Story', textContent: '\u00d7' });
-    header.appendChild(removeBtn);
-    card.appendChild(header);
+    const clone = template.content.cloneNode(true);
+    const item = clone.querySelector('.userstory-item');
+    if (!item) return;
 
-    // Fields
-    const fields = el('div', { className: 'story-fields' });
+    // Set number
+    const numEl = item.querySelector('.userstory-number');
+    if (numEl) numEl.textContent = `Story #${container.children.length + 1}`;
 
-    const fieldDefs = [
-      { key: 'role',       label: '作為（角色）',   tag: 'input',    placeholder: '例：一名飼主' },
-      { key: 'want',       label: '我想要（功能）', tag: 'input',    placeholder: '例：搜尋附近的散步員' },
-      { key: 'value',      label: '以便於（價值）', tag: 'input',    placeholder: '例：在我無法出門時，毛孩也能運動' },
-      { key: 'acceptance', label: '驗收標準',       tag: 'textarea', placeholder: '1. ...\n2. ...\n3. ...' },
-    ];
+    // Fill data if restoring
+    if (data.role) {
+      const roleInput = item.querySelector('.story-role');
+      if (roleInput) roleInput.value = data.role;
+    }
+    if (data.feature) {
+      const featureInput = item.querySelector('.story-feature');
+      if (featureInput) featureInput.value = data.feature;
+    }
+    if (data.value) {
+      const valueInput = item.querySelector('.story-value');
+      if (valueInput) valueInput.value = data.value;
+    }
+    if (data.criteria) {
+      const criteriaInput = item.querySelector('.story-criteria');
+      if (criteriaInput) criteriaInput.value = data.criteria;
+    }
+    if (data.moscow) {
+      const moscowSelect = item.querySelector('.moscow-select');
+      if (moscowSelect) moscowSelect.value = data.moscow;
+    }
 
-    fieldDefs.forEach(fd => {
-      const row = el('div', { className: 'story-row' });
-      row.appendChild(el('label', { className: 'form-label', textContent: fd.label }));
-      const attrs = {
-        className: fd.tag === 'textarea' ? 'form-textarea' : 'form-input',
-        'data-story-field': fd.key,
-        placeholder: fd.placeholder
-      };
-      if (fd.tag === 'textarea') attrs.rows = '3';
-      const input = el(fd.tag, attrs);
-      input.value = data[fd.key] || '';
-      row.appendChild(input);
-      fields.appendChild(row);
-    });
-
-    // Priority select
-    const priorityRow = el('div', { className: 'story-row' });
-    priorityRow.appendChild(el('label', { className: 'form-label', textContent: '優先級（MoSCoW）' }));
-    const select = el('select', { className: 'form-select', 'data-story-field': 'priority' });
-    [
-      ['Must',   'Must（必須有）'],
-      ['Should', 'Should（應該有）'],
-      ['Could',  'Could（可以有）'],
-      ["Won't",  "Won't（先不做）"]
-    ].forEach(([val, text]) => {
-      const opt = el('option', { value: val, textContent: text });
-      if (data.priority === val) opt.selected = true;
-      select.appendChild(opt);
-    });
-    priorityRow.appendChild(select);
-    fields.appendChild(priorityRow);
-
-    card.appendChild(fields);
-    container.appendChild(card);
+    container.appendChild(clone);
   }
 
   function collectStories() {
     const stories = [];
-    document.querySelectorAll('.story-card').forEach(card => {
+    document.querySelectorAll('#userstory-list .userstory-item').forEach(item => {
       stories.push({
-        role:       card.querySelector('[data-story-field="role"]')?.value       || '',
-        want:       card.querySelector('[data-story-field="want"]')?.value       || '',
-        value:      card.querySelector('[data-story-field="value"]')?.value      || '',
-        acceptance: card.querySelector('[data-story-field="acceptance"]')?.value || '',
-        priority:   card.querySelector('[data-story-field="priority"]')?.value   || 'Must'
+        role:     item.querySelector('.story-role')?.value     || '',
+        feature:  item.querySelector('.story-feature')?.value  || '',
+        value:    item.querySelector('.story-value')?.value    || '',
+        criteria: item.querySelector('.story-criteria')?.value || '',
+        moscow:   item.querySelector('.moscow-select')?.value  || ''
       });
     });
     return stories;
   }
 
   // ============================================
-  // 7. STAGE 5 - EARS REQUIREMENTS
+  // 6. STAGE 5 - EARS REQUIREMENTS
   // ============================================
 
   const EARS_TYPES = {
@@ -433,34 +316,34 @@
     optional:   { label: '選配功能型', template: '如果系統包含 ___，系統應該要 ___' }
   };
 
-  let reqCounter = 0;
-
   function initStage5() {
-    const container = document.querySelector('.stage-panel[data-stage="5"]');
-    if (!container) return;
-
-    const addBtn = container.querySelector('.btn-add-requirement');
-    const listContainer = container.querySelector('.requirements-list');
+    const addBtn = document.getElementById('btn-add-ears');
+    const listContainer = document.getElementById('ears-list');
     if (!addBtn || !listContainer) return;
 
-    addBtn.addEventListener('click', () => addRequirementCard(listContainer));
+    addBtn.addEventListener('click', () => addEarsFromTemplate(listContainer));
 
     listContainer.addEventListener('click', e => {
-      const removeBtn = e.target.closest('.btn-remove-requirement');
+      const removeBtn = e.target.closest('.btn-remove-ears');
       if (removeBtn) {
-        removeBtn.closest('.requirement-card')?.remove();
-        saveFromForm();
+        removeBtn.closest('.ears-item')?.remove();
+        debouncedSave();
       }
     });
 
+    // Update placeholder when type changes
     listContainer.addEventListener('change', e => {
-      const select = e.target.closest('[data-req-field="type"]');
+      const select = e.target.closest('.ears-type-select');
       if (select) {
-        const card = select.closest('.requirement-card');
-        const textarea = card?.querySelector('[data-req-field="sentence"]');
-        if (textarea && !textarea.value.trim()) {
-          const typeInfo = EARS_TYPES[select.value];
-          if (typeInfo) textarea.placeholder = typeInfo.template;
+        const item = select.closest('.ears-item');
+        const textarea = item?.querySelector('.ears-content');
+        const hint = item?.querySelector('.ears-hint');
+        const typeInfo = EARS_TYPES[select.value];
+        if (textarea && typeInfo && !textarea.value.trim()) {
+          textarea.placeholder = typeInfo.template;
+        }
+        if (hint && typeInfo) {
+          hint.textContent = `句型：${typeInfo.template}`;
         }
       }
       debounce(() => saveFromForm(), 500)();
@@ -469,63 +352,46 @@
     listContainer.addEventListener('input', debounce(() => saveFromForm(), 1000));
   }
 
-  function addRequirementCard(container, data = {}) {
-    reqCounter++;
-    const card = el('div', { className: 'requirement-card', 'data-req-id': String(reqCounter) });
+  function addEarsFromTemplate(container, data = {}) {
+    const template = document.getElementById('ears-template');
+    if (!template) return;
 
-    // Header
-    const header = el('div', { className: 'requirement-header' });
-    header.appendChild(el('span', { className: 'requirement-number', textContent: `需求 #${container.children.length + 1}` }));
-    const removeBtn = el('button', { type: 'button', className: 'btn-remove-requirement', 'aria-label': '移除此需求', textContent: '\u00d7' });
-    header.appendChild(removeBtn);
-    card.appendChild(header);
+    const clone = template.content.cloneNode(true);
+    const item = clone.querySelector('.ears-item');
+    if (!item) return;
 
-    // Fields
-    const fields = el('div', { className: 'requirement-fields' });
+    // Fill data if restoring
+    if (data.type) {
+      const typeSelect = item.querySelector('.ears-type-select');
+      if (typeSelect) typeSelect.value = data.type;
+    }
+    if (data.sentence) {
+      const textarea = item.querySelector('.ears-content');
+      if (textarea) textarea.value = data.sentence;
+    }
+    // Set hint
+    const hint = item.querySelector('.ears-hint');
+    const typeInfo = EARS_TYPES[data.type || 'ubiquitous'];
+    if (hint && typeInfo) {
+      hint.textContent = `句型：${typeInfo.template}`;
+    }
 
-    // Type select
-    const typeRow = el('div', { className: 'requirement-row' });
-    typeRow.appendChild(el('label', { className: 'form-label', textContent: '類型' }));
-    const typeSelect = el('select', { className: 'form-select', 'data-req-field': 'type' });
-    Object.entries(EARS_TYPES).forEach(([key, info]) => {
-      const opt = el('option', { value: key, textContent: info.label });
-      if (data.type === key) opt.selected = true;
-      typeSelect.appendChild(opt);
-    });
-    typeRow.appendChild(typeSelect);
-    fields.appendChild(typeRow);
-
-    // Sentence textarea
-    const sentenceRow = el('div', { className: 'requirement-row' });
-    sentenceRow.appendChild(el('label', { className: 'form-label', textContent: '需求描述' }));
-    const selectedType = data.type || 'ubiquitous';
-    const textarea = el('textarea', {
-      className: 'form-textarea',
-      'data-req-field': 'sentence',
-      placeholder: EARS_TYPES[selectedType]?.template || '',
-      rows: '2'
-    });
-    textarea.value = data.sentence || '';
-    sentenceRow.appendChild(textarea);
-    fields.appendChild(sentenceRow);
-
-    card.appendChild(fields);
-    container.appendChild(card);
+    container.appendChild(clone);
   }
 
   function collectRequirements() {
     const reqs = [];
-    document.querySelectorAll('.requirement-card').forEach(card => {
+    document.querySelectorAll('#ears-list .ears-item').forEach(item => {
       reqs.push({
-        type:     card.querySelector('[data-req-field="type"]')?.value     || 'ubiquitous',
-        sentence: card.querySelector('[data-req-field="sentence"]')?.value || ''
+        type:     item.querySelector('.ears-type-select')?.value || 'ubiquitous',
+        sentence: item.querySelector('.ears-content')?.value     || ''
       });
     });
     return reqs;
   }
 
   // ============================================
-  // 8. LOCALSTORAGE MODULE
+  // 7. LOCALSTORAGE MODULE
   // ============================================
 
   const STORAGE_KEY = 'vibe-req-sessions';
@@ -538,9 +404,9 @@
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       stages: {
-        1: { mode: 'quick', need: '', aspiration: '', constraint: '', role: '', experience: '', trust: '' },
-        2: { level: 0, answers: [null, null, null, null, null] },
-        3: { strategy: '', scope: '', structure: '', skeleton: '', surface: '' },
+        1: { mode: 'quick' },
+        2: { level: 0, answers: [] },
+        3: {},
         4: { stories: [] },
         5: { requirements: [] }
       }
@@ -590,29 +456,32 @@
     const session = getCurrentSession() || createNewSession();
 
     // Stage 1 - CARNET
-    const modeContainer = document.querySelector('.carnet-fields');
-    session.stages[1].mode = modeContainer?.dataset.currentMode || 'quick';
+    const modeRadio = document.querySelector('input[name="carnet-mode"]:checked');
+    session.stages[1] = session.stages[1] || {};
+    session.stages[1].mode = modeRadio?.value || 'quick';
     document.querySelectorAll('[data-stage="1"][data-field]').forEach(input => {
+      if (input.name === 'carnet-mode') return; // skip mode radios
       session.stages[1][input.dataset.field] = input.value;
     });
 
     // Stage 2 - Complexity
-    const levelField = document.querySelector('[data-stage="2"][data-field="level"]');
-    if (levelField) session.stages[2].level = parseInt(levelField.value, 10) || 0;
+    const complexityResult = calculateComplexity();
+    session.stages[2] = { level: complexityResult.level, answers: complexityResult.answers };
 
     // Stage 3 - Product Layers
+    session.stages[3] = session.stages[3] || {};
     document.querySelectorAll('[data-stage="3"][data-field]').forEach(input => {
       session.stages[3][input.dataset.field] = input.value;
     });
 
     // Stage 4 - User Stories
-    session.stages[4].stories = collectStories();
+    session.stages[4] = { stories: collectStories() };
 
     // Stage 5 - EARS Requirements
-    session.stages[5].requirements = collectRequirements();
+    session.stages[5] = { requirements: collectRequirements() };
 
     // Session name
-    const nameInput = document.querySelector('#session-name');
+    const nameInput = document.getElementById('session-name');
     if (nameInput && nameInput.value.trim()) session.name = nameInput.value.trim();
 
     return session;
@@ -623,70 +492,72 @@
     saveSession(session);
   }
 
+  const debouncedSave = debounce(() => saveFromForm(), 1000);
+
   function loadSessionToForm(session) {
     if (!session) return;
     setCurrentSessionId(session.id);
 
     // Session name
-    const nameInput = document.querySelector('#session-name');
+    const nameInput = document.getElementById('session-name');
     if (nameInput) nameInput.value = session.name || '未命名專案';
 
     // Stage 1 - CARNET
-    const s1 = session.stages[1] || {};
+    const s1 = session.stages?.[1] || {};
     const mode = s1.mode || 'quick';
-    const modeContainer = document.querySelector('.carnet-mode-toggle');
-    const fieldsContainer = document.querySelector('.carnet-fields');
-    if (modeContainer && fieldsContainer) {
-      modeContainer.querySelectorAll('[data-mode]').forEach(btn =>
-        btn.classList.toggle('active', btn.dataset.mode === mode)
-      );
-      renderCarnetFields(fieldsContainer, mode);
+    const modeRadio = document.querySelector(`input[name="carnet-mode"][value="${mode}"]`);
+    if (modeRadio) {
+      modeRadio.checked = true;
+      modeRadio.dispatchEvent(new Event('change', { bubbles: true }));
     }
-    // Fill values after DOM update
+    // Fill field values
     setTimeout(() => {
       document.querySelectorAll('[data-stage="1"][data-field]').forEach(input => {
+        if (input.name === 'carnet-mode') return;
         if (s1[input.dataset.field] !== undefined) input.value = s1[input.dataset.field];
       });
     }, 0);
 
     // Stage 2 - Complexity
-    const s2 = session.stages[2] || {};
-    if (s2.answers) {
-      const panel = document.querySelector('.stage-panel[data-stage="2"]');
-      if (panel) {
-        panel.querySelectorAll('.complexity-question').forEach(q => {
-          q.classList.remove('disabled');
-          q.querySelectorAll('input[type="radio"]').forEach(r => { r.disabled = false; r.checked = false; });
-        });
-        s2.answers.forEach((answer, i) => {
-          if (answer !== null) {
-            const val = answer ? 'yes' : 'no';
-            const radio = panel.querySelector(`input[name="complexity-q${i}"][value="${val}"]`);
-            if (radio) radio.checked = true;
-          }
-        });
-        calculateComplexity(panel);
-      }
+    const s2 = session.stages?.[2] || {};
+    // Reset all quiz radios first
+    COMPLEXITY_QUESTIONS.forEach(q => {
+      document.querySelectorAll(`input[name="${q.name}"]`).forEach(r => {
+        r.disabled = false;
+        r.checked = false;
+        r.closest('.quiz-question')?.classList.remove('disabled');
+      });
+    });
+    // Restore answers
+    if (s2.answers && s2.answers.length > 0) {
+      s2.answers.forEach((answer, i) => {
+        if (answer !== null && i < COMPLEXITY_QUESTIONS.length) {
+          const val = answer ? 'yes' : 'no';
+          const radio = document.querySelector(`input[name="${COMPLEXITY_QUESTIONS[i].name}"][value="${val}"]`);
+          if (radio) radio.checked = true;
+        }
+      });
+      calculateComplexity();
     }
 
     // Stage 3 - Product Layers
-    const s3 = session.stages[3] || {};
+    const s3 = session.stages?.[3] || {};
     document.querySelectorAll('[data-stage="3"][data-field]').forEach(input => {
       input.value = s3[input.dataset.field] || '';
     });
 
     // Stage 4 - User Stories
-    const storiesList = document.querySelector('.stories-list');
-    if (storiesList) {
-      storiesList.textContent = '';
-      (session.stages[4]?.stories || []).forEach(story => addStoryCard(storiesList, story));
+    const listContainer = document.getElementById('userstory-list');
+    if (listContainer) {
+      listContainer.textContent = '';
+      (session.stages?.[4]?.stories || []).forEach(story => addStoryFromTemplate(listContainer, story));
     }
 
     // Stage 5 - EARS Requirements
-    const reqsList = document.querySelector('.requirements-list');
-    if (reqsList) {
-      reqsList.textContent = '';
-      (session.stages[5]?.requirements || []).forEach(req => addRequirementCard(reqsList, req));
+    const earsList = document.getElementById('ears-list');
+    if (earsList) {
+      earsList.textContent = '';
+      (session.stages?.[5]?.requirements || []).forEach(req => addEarsFromTemplate(earsList, req));
     }
   }
 
@@ -706,21 +577,23 @@
     loadSessionToForm(session);
 
     // Auto-save on input change (debounced)
-    const workshopContainer = document.querySelector('.workshop') || document.body;
-    const debouncedSave = debounce(() => saveFromForm(), 1000);
-    workshopContainer.addEventListener('input', debouncedSave);
-    workshopContainer.addEventListener('change', debouncedSave);
+    const workshopSection = document.getElementById('section-workshop');
+    if (workshopSection) {
+      workshopSection.addEventListener('input', debouncedSave);
+      workshopSection.addEventListener('change', debouncedSave);
+    }
   }
 
   // ============================================
-  // 9. EXPORT MODULE
+  // 8. EXPORT MODULE
   // ============================================
 
   function generateMarkdown(session) {
-    const s1 = session.stages[1] || {};
-    const s2 = session.stages[2] || {};
-    const s4 = session.stages[4] || {};
-    const s5 = session.stages[5] || {};
+    const s1 = session.stages?.[1] || {};
+    const s2 = session.stages?.[2] || {};
+    const s3 = session.stages?.[3] || {};
+    const s4 = session.stages?.[4] || {};
+    const s5 = session.stages?.[5] || {};
     const level = s2.level || 0;
     const levelInfo = COMPLEXITY_LEVELS[level] || COMPLEXITY_LEVELS[0];
 
@@ -728,6 +601,7 @@
 
     // 1. Product Overview (CARNET)
     md += `## 1. 產品概述\n\n`;
+    if (s1.summary)    md += `**核心想法**：${s1.summary}\n\n`;
     if (s1.need)       md += `**需求來源（N）**：${s1.need}\n\n`;
     if (s1.aspiration) md += `**期待成果（A）**：${s1.aspiration}\n\n`;
     if (s1.constraint) md += `**限制條件（C）**：${s1.constraint}\n\n`;
@@ -745,39 +619,52 @@
       md += `尚未評估。\n\n`;
     }
 
-    // 3. Core User Stories (ordered by MoSCoW)
-    md += `## 3. 核心 User Stories\n\n`;
+    // 3. Product Layers
+    md += `## 3. 產品分層思考\n\n`;
+    const layerNames = { strategy: '戰略層', scope: '範圍層', structure: '結構層', skeleton: '框架層', surface: '表現層' };
+    let hasLayers = false;
+    for (const [key, label] of Object.entries(layerNames)) {
+      if (s3[key]) {
+        md += `**${label}**：${s3[key]}\n\n`;
+        hasLayers = true;
+      }
+    }
+    if (!hasLayers) md += `尚未填寫。\n\n`;
+
+    // 4. Core User Stories (ordered by MoSCoW)
+    md += `## 4. 核心 User Stories\n\n`;
     const stories = s4.stories || [];
-    const priorityOrder = ['Must', 'Should', 'Could', "Won't"];
+    const priorityOrder = ['must', 'should', 'could', 'wont', ''];
     const sorted = [...stories].sort((a, b) =>
-      priorityOrder.indexOf(a.priority) - priorityOrder.indexOf(b.priority)
+      priorityOrder.indexOf(a.moscow || '') - priorityOrder.indexOf(b.moscow || '')
     );
     if (sorted.length === 0) {
       md += `尚未填寫。\n\n`;
     } else {
       sorted.forEach((story, i) => {
-        md += `### Story ${i + 1}（${story.priority}）\n\n`;
+        const label = story.moscow ? story.moscow.toUpperCase() : '未分級';
+        md += `### Story ${i + 1}（${label}）\n\n`;
         md += '```\n';
-        md += `作為${story.role}，\n`;
-        md += `我想要${story.want}，\n`;
-        md += `以便於${story.value}。\n`;
-        if (story.acceptance) md += `\n驗收標準：\n${story.acceptance}\n`;
+        md += `作為${story.role || '___'}，\n`;
+        md += `我想要${story.feature || '___'}，\n`;
+        md += `以便於${story.value || '___'}。\n`;
+        if (story.criteria) md += `\n驗收標準：\n${story.criteria}\n`;
         md += '```\n\n';
       });
     }
 
-    // 4. Architecture Suggestion
-    md += `## 4. 系統架構建議\n\n`;
+    // 5. Architecture Suggestion
+    md += `## 5. 系統架構建議\n\n`;
     md += generateArchitectureSuggestion(level);
 
-    // 5. Edge Cases
-    md += `## 5. Edge Cases 清單\n\n`;
+    // 6. Edge Cases
+    md += `## 6. Edge Cases 清單\n\n`;
     const edgeCases = extractEdgeCases(stories);
     edgeCases.forEach(ec => { md += `- ${ec}\n`; });
     md += '\n';
 
-    // 6. EARS Requirements (grouped by type)
-    md += `## 6. EARS 格式需求\n\n`;
+    // 7. EARS Requirements (grouped by type)
+    md += `## 7. EARS 格式需求\n\n`;
     const reqs = s5.requirements || [];
     if (reqs.length === 0) {
       md += `尚未填寫。\n\n`;
@@ -797,12 +684,12 @@
       });
     }
 
-    // 7. Non-functional Requirements
-    md += `## 7. 非功能性需求\n\n`;
+    // 8. Non-functional Requirements
+    md += `## 8. 非功能性需求\n\n`;
     md += generateNonFunctionalRequirements(level);
 
-    // 8. Technology Suggestion
-    md += `## 8. 建議技術選型\n\n`;
+    // 9. Technology Suggestion
+    md += `## 9. 建議技術選型\n\n`;
     md += generateTechSuggestion(level);
 
     md += `---\n\n*此文件由 Vibe Requirements 互動工作坊產出，可直接作為 AI 開發的起點。*\n`;
@@ -835,8 +722,8 @@
   function extractEdgeCases(stories) {
     const cases = [];
     stories.forEach(story => {
-      if (!story.acceptance) return;
-      story.acceptance.split('\n').forEach(line => {
+      if (!story.criteria) return;
+      story.criteria.split('\n').forEach(line => {
         const trimmed = line.trim();
         if (trimmed.match(/如果|若|超時|失敗|錯誤|異常|斷|沒有|不存在|取消|過期|重複/)) {
           cases.push(trimmed.replace(/^\d+\.\s*/, ''));
@@ -892,15 +779,7 @@
     return navigator.clipboard.writeText(text).then(() => {
       showToast('已複製到剪貼簿！', 'success');
     }).catch(() => {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.left = '-9999px';
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand('copy'); showToast('已複製到剪貼簿！', 'success'); }
-      catch { showToast('複製失敗，請手動複製。', 'error'); }
-      document.body.removeChild(ta);
+      showToast('複製失敗，請手動複製。', 'error');
     });
   }
 
@@ -918,20 +797,21 @@
   }
 
   function initExport() {
-    const btnCopy = document.querySelector('#btn-copy-md');
-    const btnDownload = document.querySelector('#btn-download-md');
-    const previewContainer = document.querySelector('#markdown-preview');
+    // Wire up HTML buttons: #btn-save-session, #btn-export-md
+    const btnSave = document.getElementById('btn-save-session');
+    const btnExport = document.getElementById('btn-export-md');
 
-    if (btnCopy) {
-      btnCopy.addEventListener('click', () => {
+    if (btnSave) {
+      btnSave.addEventListener('click', () => {
         const session = collectFormData();
         saveSession(session);
-        copyToClipboard(generateMarkdown(session));
+        renderRecordsList();
+        showToast('已儲存紀錄！', 'success');
       });
     }
 
-    if (btnDownload) {
-      btnDownload.addEventListener('click', () => {
+    if (btnExport) {
+      btnExport.addEventListener('click', () => {
         const session = collectFormData();
         saveSession(session);
         const md = generateMarkdown(session);
@@ -939,24 +819,15 @@
         downloadMarkdown(`${safeName}.md`, md);
       });
     }
-
-    const btnPreview = document.querySelector('#btn-preview-md');
-    if (btnPreview && previewContainer) {
-      btnPreview.addEventListener('click', () => {
-        const session = collectFormData();
-        previewContainer.textContent = generateMarkdown(session);
-        previewContainer.hidden = false;
-      });
-    }
   }
 
   // ============================================
-  // 10. RECORDS UI MODULE
+  // 9. RECORDS UI MODULE
   // ============================================
 
   function initRecords() {
-    const recordsList = document.querySelector('#records-list');
-    const btnNew = document.querySelector('#btn-new-session');
+    const recordsList = document.getElementById('records-list');
+    const btnNew = document.getElementById('btn-new-session');
 
     if (btnNew) {
       btnNew.addEventListener('click', () => {
@@ -964,6 +835,7 @@
         saveSession(session);
         setCurrentSessionId(session.id);
         loadSessionToForm(session);
+        renderRecordsList();
         showToast('已建立新專案！', 'success');
         switchToWorkshop();
       });
@@ -980,6 +852,7 @@
           const session = getSession(loadBtn.dataset.sessionId);
           if (session) {
             loadSessionToForm(session);
+            renderRecordsList();
             showToast(`已載入「${session.name}」`, 'success');
             switchToWorkshop();
           }
@@ -1011,7 +884,7 @@
           session.name = nameInput.value.trim() || '未命名專案';
           saveSession(session);
           if (id === getCurrentSessionId()) {
-            const mainInput = document.querySelector('#session-name');
+            const mainInput = document.getElementById('session-name');
             if (mainInput) mainInput.value = session.name;
           }
         }
@@ -1020,7 +893,7 @@
   }
 
   function renderRecordsList() {
-    const recordsList = document.querySelector('#records-list');
+    const recordsList = document.getElementById('records-list');
     if (!recordsList) return;
 
     const sessions = getAllSessions();
@@ -1029,7 +902,7 @@
     recordsList.textContent = '';
 
     if (sessions.length === 0) {
-      recordsList.appendChild(el('p', { className: 'records-empty', textContent: '尚無紀錄，點擊「新增專案」開始吧！' }));
+      recordsList.appendChild(el('p', { className: 'records-empty', textContent: '目前沒有儲存的紀錄。開始你的第一次需求探索吧！' }));
       return;
     }
 
@@ -1041,7 +914,7 @@
       });
       const isCurrent = session.id === getCurrentSessionId();
 
-      const card = el('div', { className: `record-card${isCurrent ? ' current' : ''}`, 'data-session-id': session.id });
+      const card = el('div', { className: `record-card${isCurrent ? ' current' : ''}` });
 
       // Info section
       const info = el('div', { className: 'record-info' });
@@ -1051,12 +924,15 @@
       if (level > 0) {
         info.appendChild(el('span', { className: `record-badge level-${level}`, textContent: levelInfo.name }));
       }
+      if (isCurrent) {
+        info.appendChild(el('span', { className: 'record-current-badge', textContent: '目前' }));
+      }
       card.appendChild(info);
 
       // Actions
       const actions = el('div', { className: 'record-actions' });
-      actions.appendChild(el('button', { className: 'btn-load-session', 'data-session-id': session.id, textContent: '載入' }));
-      actions.appendChild(el('button', { className: 'btn-delete-session', 'data-session-id': session.id, textContent: '刪除' }));
+      actions.appendChild(el('button', { className: 'btn btn-sm btn-secondary btn-load-session', 'data-session-id': session.id, textContent: '載入' }));
+      actions.appendChild(el('button', { className: 'btn btn-sm btn-danger btn-delete-session', 'data-session-id': session.id, textContent: '刪除' }));
       card.appendChild(actions);
 
       recordsList.appendChild(card);
@@ -1064,14 +940,14 @@
   }
 
   function switchToWorkshop() {
-    const link = document.querySelector('.nav-link[href="#workshop"]');
+    const link = document.querySelector('.nav-link[href="#section-workshop"]');
     if (link) { link.click(); return; }
-    const ws = document.getElementById('workshop');
+    const ws = document.getElementById('section-workshop');
     if (ws) ws.scrollIntoView({ behavior: 'smooth' });
   }
 
   // ============================================
-  // 11. TOAST MODULE
+  // 10. TOAST MODULE
   // ============================================
 
   function showToast(message, type = 'success') {
@@ -1084,17 +960,15 @@
     const toast = el('div', { className: `toast toast-${type}`, role: 'alert', textContent: message });
     container.appendChild(toast);
 
-    requestAnimationFrame(() => toast.classList.add('toast-visible'));
-
     setTimeout(() => {
-      toast.classList.remove('toast-visible');
-      toast.addEventListener('transitionend', () => toast.remove(), { once: true });
-      setTimeout(() => toast.remove(), 500);
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(20px)';
+      setTimeout(() => toast.remove(), 400);
     }, 3000);
   }
 
   // ============================================
-  // 12. INIT
+  // 11. INIT
   // ============================================
 
   document.addEventListener('DOMContentLoaded', () => {
